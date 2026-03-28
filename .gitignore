@@ -1,0 +1,19 @@
+# Entornos Virtuales de Python
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Archivos Caché y Compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Carpetas y Archivos Locales del Proyecto
+spotify_session/
+
+# Sistemas Operativos
+.DS_Store
+Thumbs.db
