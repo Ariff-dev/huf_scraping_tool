@@ -1,0 +1,21 @@
+# Estándar moderno de Compose (sin propiedad 'version')
+name: music-scraper
+
+services:
+  scraper-api:
+    build: .
+    container_name: music-scraper-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    # Aumentar la memoria compartida (SHM) es VITAL en contenedores con motores de navegador de Chromium
+    # para prevenir colapsos repentinos de memoria (Crush "Out of Memory").
+    shm_size: '1gb'
+    env_file:
+      - .env
+    environment:
+      # Sobreescribimos cualquier valor del .env local para asegurar que en servidor
+      # SIEMPRE corra en modo Headless (sin ventana), porque los servidores Ubuntu no tienen monitor.
+      - SCRAPER_HEADLESS=True
+      - FLASK_PORT=5000
+      - FLASK_HOST=0.0.0.0
