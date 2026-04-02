@@ -11,6 +11,8 @@ app = Flask(__name__)
 # Registrar Blueprints de las rutas
 # Accesible bajo el prefijo /api, por lo tanto el endpoint será /api/infart/
 app.register_blueprint(spotify_bp, url_prefix='/api')
+app.register_blueprint(huf_bp, url_prefix='/api')
+
 
 if __name__ == '__main__':
     # Obtener puerto y host desde entorno o establecer por defecto
