@@ -1,104 +1,115 @@
-# Music Platform Metadata Scraper API
+# HUF Scraping Tool API
 
-This is a Flask-based REST API designed to perform headless web scraping on major music streaming platforms. It extracts rich musical metadata, artist biographies, listening statistics, and search URLs using Playwright. 
-
-This tool is particularly useful for generating robust context data for automated workflows, prompt generators, or AI pipelines where real-world music metric extraction is required safely and efficiently via multithreading.
+A Flask-based REST API that combines **web scraping** (Playwright + Spotify) with a **database layer** (Supabase) and **media management** (Cloudinary). Designed to be called from automated workflows like n8n.
 
 ## 🚀 Features
 
-- **Concurrent Execution**: Executes multiple browser sessions simultaneously via `ThreadPoolExecutor` to halve the overall querying time.
-- **Headless Scraping**: Powered by Playwright to bypass common bot-protections and fully render dynamic Single Page Applications before data extraction.
-- **Rich Metadata Extraction**: Parses nested components (like "About" sections or hover-cards) to extract bios, listener numbers, and image references.
-- **Environment configuration**: Clean setup using Python's `dotenv` to maintain environments completely decoupled from the codebase.
+- **Spotify Scraper** — Extracts artist bios, listener counts, and song metadata via headless Playwright browser sessions, executed concurrently with `ThreadPoolExecutor`.
+- **HUF Database Layer** — Full CRUD interface over Supabase for `artistas` and `canciones` tables, using `service_role` key for secure server-side writes.
+- **Cloudinary Image Upload** — Accepts an `image_url` in the request body, downloads it server-side, uploads it to Cloudinary, and stores the `public_id` in Supabase.
+- **Environment-based config** — All secrets managed via `.env`, never hardcoded.
 
 ## 🛠️ Requirements
 
 - Python 3.10+
 - Chromium via Playwright
+- Supabase project (tables: `artistas`, `canciones`)
+- Cloudinary account
 
 ## 📦 Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Ariff-dev/huf_scraping_tool.git
-   cd huf_scraping_tool
-   ```
-
-2. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv venv
-   
-   # For Windows PowerShell
-   .\venv\Scripts\Activate.ps1
-   ```
-
-3. **Install the dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Install the Playwright browser executables:**
-   ```bash
-   playwright install chromium
-   ```
-
-5. **Configure environment variables:**
-   Duplicate the `.env.example` file and rename it to `.env`. Adjust your target settings:
-   ```env
-   # .env
-   FLASK_PORT=5000
-   FLASK_HOST=0.0.0.0
-   FLASK_ENV=development
-   SCRAPER_HEADLESS=True
-   ```
-
-## ⚙️ Usage
-
-Start the Flask server:
 ```bash
-python main.py
+# 1. Clone
+git clone https://github.com/Ariff-dev/huf_scraping_tool.git
+cd huf_scraping_tool
+
+# 2. Virtual environment
+python -m venv venv
+.\venv\Scripts\Activate.ps1   # Windows PowerShell
+# source venv/bin/activate    # Linux / macOS
+
+# 3. Dependencies
+pip install -r requirements.txt
+
+# 4. Playwright browser
+playwright install chromium
+
+# 5. Environment variables
+# Copy .env.example → .env and fill in your values
 ```
 
-### Endpoint: `/api/inf/`
-**Method:** `POST`
+## ⚙️ Running
 
-Extracts both the artist details and the specific track discovery flow simultaneously, returning a single assembled structure.
+```bash
+.\venv\Scripts\python.exe .\main.py   # Windows
+# python main.py                       # Linux / macOS
+```
 
-**Request Payload:**
+Server starts at `http://0.0.0.0:5000`.
+
+---
+
+## 📡 Endpoints
+
+### Spotify
+
+#### `POST /api/inf/`
+Scrapes artist info and song metadata simultaneously.
+
+```json
+{ "artist": "Borja Picó", "song": "Sonrisas" }
+```
+
+---
+
+### HUF — Artists
+
+#### `POST /huf/artcr/`
+Creates a new artist. If `image_url` is provided, the image is downloaded and uploaded to Cloudinary automatically.
+
 ```json
 {
-  "artist": "Artist Name",
-  "song": "Song Title"
+  "nombre": "Artist Name",
+  "descripcion": "Bio text...",
+  "image_url": "https://example.com/photo.jpg",
+  "url_spotify": "https://open.spotify.com/...",
+  "url_instagram": "https://instagram.com/...",
+  "url_tiktok": "https://tiktok.com/...",
+  "url_youtube": "https://youtube.com/...",
+  "url_facebook": "https://facebook.com/...",
+  "url_sitio_web": "https://artist.com"
 }
 ```
 
-**cURL / PowerShell Example:**
-```powershell
-Invoke-RestMethod -Uri "http://127.0.0.1:5000/api/inf/" -Method POST -Headers @{"Content-Type"="application/json"} -Body '{"artist": "Borja Picó", "song": "Sonrisas"}'
-```
+---
 
-**Success Response Example:**
+### HUF — Songs
+
+#### `POST /huf/songcr/`
+Creates a new song. If `image_url` is provided, the cover is uploaded to Cloudinary automatically.
+
 ```json
 {
-  "artist": "Borja Picó",
-  "song": "Sonrisas",
-  "artist_data": {
-    "extracted": {
-      "artist_name": "...",
-      "bio": "...",
-      "image_url": "...",
-      "monthly_listeners": "..."
-    },
-    ...
-  },
-  "song_data": {
-      "song_url": "...",
-      ...
-  },
-  "success": true
+  "nombre": "Song Title",
+  "artista_id": 1,
+  "descripcion": "Full description...",
+  "descripcion_corta": "Short version",
+  "creditos": "Written by...",
+  "image_url": "https://example.com/cover.jpg",
+  "url_spotify": "https://open.spotify.com/...",
+  "url_tiktok": "https://tiktok.com/...",
+  "url_youtube": "https://youtube.com/..."
 }
+```
+
+---
+
+## 🐳 Docker
+
+```bash
+docker compose up --build
 ```
 
 ## ⚖️ Disclaimer
 
-This repository is for educational and research purposes. Ensure to always abide by the terms of service of the web applications you interact with. 
+This repository is for educational and research purposes. Always abide by the terms of service of any platform you interact with.

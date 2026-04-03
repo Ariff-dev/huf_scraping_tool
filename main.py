@@ -9,10 +9,11 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Registrar Blueprints de las rutas
-# Accesible bajo el prefijo /api, por lo tanto el endpoint será /api/infart/
+# Register blueprints
+# Spotify: /api/inf/
+# HUF:     /api/huf/artcr/  |  /api/huf/songcr/
 app.register_blueprint(spotify_bp, url_prefix='/api')
-app.register_blueprint(huf_bp, url_prefix='/api')
+app.register_blueprint(huf_bp, url_prefix='/huf')
 
 
 if __name__ == '__main__':
