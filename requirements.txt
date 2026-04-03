@@ -2,6 +2,17 @@ Flask
 playwright
 python-dotenv
 gunicorn
-supabase
+# Supabase y sus dependencias (pyiceberg excluida por incompatibilidad en Windows)
+supabase-auth
+supabase-functions
+postgrest>=0.19,<0.20
+realtime>=2.4,<3
+gotrue>=2.12,<3
+storage3>=0.11,<0.12
+supafunc>=0.9,<0.10
+httpx
+pydantic
+# Image tools
 cloudinary
 requests
+urllib3
