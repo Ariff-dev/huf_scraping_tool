@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 from app.routes.spotify import spotify_bp
+from app.routes.huf import huf_bp
 
 # Cargar variables de entorno locales desde el archivo .env si existe
 load_dotenv()

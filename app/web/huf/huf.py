@@ -26,30 +26,9 @@ def get_admin_client() -> Client:
 # ─────────────────────────────────────────────
 
 class ArtistasDB:
-    """Operations on the `artistas` table."""
-
     def __init__(self):
-        self.db: Client = get_supabase_client()    # Public
         self.admin: Client = get_admin_client()     # Admin
         self.table = "artistas"
-
-    # ---------- READ ----------
-
-    def get_all(self) -> list:
-        """Gives all the artists."""
-        response = self.db.table(self.table).select("*").execute()
-        return response.data
-
-    def get_by_id(self, artista_id: int) -> dict | None:
-        """Gives an artist by ID."""
-        response = (
-            self.db.table(self.table)
-            .select("*")
-            .eq("id", artista_id)
-            .single()
-            .execute()
-        )
-        return response.data
 
     # ---------- WRITE ----------
 
@@ -76,74 +55,14 @@ class ArtistasDB:
         response = self.admin.table(self.table).insert(data).execute()
         return response.data
 
-    def update(self, artista_id: int, **fields) -> dict:
-        """
-        Updates an artist by ID.
-        """
-        response = (
-            self.admin.table(self.table)
-            .update(fields)
-            .eq("id", artista_id)
-            .execute()
-        )
-        return response.data
-
-    def delete(self, artista_id: int) -> dict:
-        """
-        Deletes an artist by ID.
-        """
-        response = (
-            self.admin.table(self.table)
-            .delete()
-            .eq("id", artista_id)
-            .execute()
-        )
-        return response.data
-
-
 # ─────────────────────────────────────────────
 #  CANCIONES
 # ─────────────────────────────────────────────
 
 class CancionesDB:
-    """Operations on the `canciones` table."""
-
     def __init__(self):
-        self.db: Client = get_supabase_client()    # Public
         self.admin: Client = get_admin_client()     # Admin
         self.table = "canciones"
-
-    # ---------- READ ----------
-
-    def get_all(self) -> list:
-        """Gives all the songs, including the artist's name and photo."""
-        response = (
-            self.db.table(self.table)
-            .select("*, artistas(id, nombre, foto_url)")
-            .execute()
-        )
-        return response.data
-
-    def get_by_id(self, cancion_id: int) -> dict | None:
-        """Gives a song by ID."""
-        response = (
-            self.db.table(self.table)
-            .select("*, artistas(id, nombre, foto_url)")
-            .eq("id", cancion_id)
-            .single()
-            .execute()
-        )
-        return response.data
-
-    def get_by_artista(self, artista_id: int) -> list:
-        """Gives all the songs of a specific artist."""
-        response = (
-            self.db.table(self.table)
-            .select("*")
-            .eq("artista_id", artista_id)
-            .execute()
-        )
-        return response.data
 
     # ---------- WRITE ----------
 
@@ -167,28 +86,4 @@ class CancionesDB:
         }
         data = {k: v for k, v in data.items() if v is not None}
         response = self.admin.table(self.table).insert(data).execute()
-        return response.data
-
-    def update(self, cancion_id: int, **fields) -> dict:
-        """
-        Updates a song by ID.
-        """
-        response = (
-            self.admin.table(self.table)
-            .update(fields)
-            .eq("id", cancion_id)
-            .execute()
-        )
-        return response.data
-
-    def delete(self, cancion_id: int) -> dict:
-        """
-        Deletes a song by ID.
-        """
-        response = (
-            self.admin.table(self.table)
-            .delete()
-            .eq("id", cancion_id)
-            .execute()
-        )
         return response.data
