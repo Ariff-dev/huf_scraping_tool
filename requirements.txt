@@ -3,3 +3,5 @@ playwright
 python-dotenv
 gunicorn
 supabase
+cloudinary
+requests
